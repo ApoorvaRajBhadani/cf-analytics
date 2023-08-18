@@ -118,40 +118,50 @@ function findProblemURL(contestId,index){
     return `https://codeforces.com/problemset/gymProblem/${contestId}/${index}`;
   }
 }
-function createProblemRatingChart(){
-  var ctx = document.getElementById('problemRatingChart').getContext('2d');
-  var myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: ratingChartLabel,
-          datasets: [{
-              label: 'Problems Solved',
-              data: ratingChartData,
-              backgroundColor: ratingChartBackgroundColor,
-              borderColor: 'rgba(0  ,0  ,0  ,1)',//ratingChartBorderColor,
-              borderWidth: 0.75,
-          }]
-      },
-      options: {
-          aspectRatio : 2.5,
-          scales: {
-            x: {
-              title:{
-                text: 'Problem Rating',
-                display: false,
-              }
-            },
-            y: {
-                title:{
-                  text: 'Problems Solved',
-                  display: false,
+function createProblemRatingChart() {
+    var ctx = document.getElementById('problemRatingChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ratingChartLabel,
+            datasets: [{
+                label: 'Problems Solved',
+                data: ratingChartData,
+                backgroundColor: ratingChartBackgroundColor,
+                borderColor: 'rgba(0  ,0  ,0  ,1)',
+                borderWidth: 0.75,
+            }]
+        },
+        options: {
+            aspectRatio: 2.5,
+            scales: {
+                x: {
+                    title: {
+                        text: 'Problem Rating',
+                        display: false,
+                    }
                 },
-                beginAtZero: true
+                y: {
+                    title: {
+                        text: 'Problems Solved',
+                        display: false,
+                    },
+                    beginAtZero: true
+                }
+            },
+            onClick: function (event, elements) {
+                if (elements.length > 0) {
+                    var dataIndex = elements[0].index;
+                    var clickedRating = ratingChartLabel[dataIndex];
+                    var xValue = clickedRating.split('-')[0];
+                    var url = 'https://codeforces.com/problemset?tags=' + xValue + '-' + xValue;
+                    window.location.href = url;
+                }
             }
-          }
-      }
-  });
+        }
+    });
 }
+
 function createTagChart(){
   var ctx = document.getElementById('tagChart').getContext('2d');
   var myChart = new Chart(ctx, {
