@@ -151,10 +151,10 @@ function createProblemRatingChart() {
             },
             onClick: function (event, elements) {
                 if (elements.length > 0) {
-                    var dataIndex = elements[0].index;
-                    var clickedRating = ratingChartLabel[dataIndex];
-                    var xValue = clickedRating.split('-')[0];
-                    var url = 'https://codeforces.com/problemset?tags=' + xValue + '-' + xValue;
+                    const dataIndex = elements[0].index;
+                    const ratingLevel = 800 + (dataIndex * 100);
+                    ratingLevel = ratingLevel.toString();
+                    const url = 'https://codeforces.com/problemset?tags=' + ratingLevel + '-' + ratingLevel;
                     window.location.href = url;
                 }
             }
