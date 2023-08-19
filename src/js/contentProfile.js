@@ -118,50 +118,49 @@ function findProblemURL(contestId,index){
     return `https://codeforces.com/problemset/gymProblem/${contestId}/${index}`;
   }
 }
-function createProblemRatingChart() {
-    var ctx = document.getElementById('problemRatingChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ratingChartLabel,
-            datasets: [{
-                label: 'Problems Solved',
-                data: ratingChartData,
-                backgroundColor: ratingChartBackgroundColor,
-                borderColor: 'rgba(0  ,0  ,0  ,1)',
-                borderWidth: 0.75,
-            }]
-        },
-        options: {
-            aspectRatio: 2.5,
-            scales: {
-                x: {
-                    title: {
-                        text: 'Problem Rating',
-                        display: false,
-                    }
-                },
-                y: {
-                    title: {
-                        text: 'Problems Solved',
-                        display: false,
-                    },
-                    beginAtZero: true
-                }
+function createProblemRatingChart(){
+  var ctx = document.getElementById('problemRatingChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: ratingChartLabel,
+          datasets: [{
+              label: 'Problems Solved',
+              data: ratingChartData,
+              backgroundColor: ratingChartBackgroundColor,
+              borderColor: 'rgba(0  ,0  ,0  ,1)',//ratingChartBorderColor,
+              borderWidth: 0.75,
+          }]
+      },
+      options: {
+          aspectRatio : 2.5,
+          scales: {
+            x: {
+              title:{
+                text: 'Problem Rating',
+                display: false,
+              }
             },
-            onClick: function (event, elements) {
-                if (elements.length > 0) {
-                    const dataIndex = elements[0].index;
-                    let ratingLevel = 800 + (dataIndex * 100);
-                    ratingLevel = ratingLevel.toString();
-                    const url = 'https://codeforces.com/problemset?tags=' + ratingLevel + '-' + ratingLevel;
-                    window.location.href = url;
-                }
+            y: {
+                title:{
+                  text: 'Problems Solved',
+                  display: false,
+                },
+                beginAtZero: true
             }
-        }
-    });
+          },
+          onClick: function (event, elements) {
+            if (elements.length > 0) {
+                const dataIndex = elements[0].index;
+                let ratingLevel = 800 + (dataIndex * 100);
+                ratingLevel = ratingLevel.toString();
+                const url = 'https://codeforces.com/problemset?tags=' + ratingLevel + '-' + ratingLevel;
+                window.location.href = url;
+            }
+          }
+      }
+  });
 }
-
 function createTagChart(){
   var ctx = document.getElementById('tagChart').getContext('2d');
   var myChart = new Chart(ctx, {
