@@ -148,6 +148,15 @@ function createProblemRatingChart(){
                 },
                 beginAtZero: true
             }
+          },
+          onClick: function (event, elements) {
+            if (elements.length > 0) {
+                const dataIndex = elements[0].index;
+                let ratingLevel = 800 + (dataIndex * 100);
+                ratingLevel = ratingLevel.toString();
+                const url = 'https://codeforces.com/problemset?tags=' + ratingLevel + '-' + ratingLevel;
+                window.location.href = url;
+            }
           }
       }
   });
