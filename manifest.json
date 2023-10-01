@@ -25,11 +25,12 @@
         },
         {
             "matches": ["https://codeforces.com/profile/*"],
-            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/contentProfile.js"],
+            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/contentProfile.js", "src/js/utils.js"],
             "css": ["src/css/contentProfile.css"]
         }
     ],
     "permissions":[
-        "https://codeforces.com/*"
+        "https://codeforces.com/*",
+        "storage"
     ]
 }
