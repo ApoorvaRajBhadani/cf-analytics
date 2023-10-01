@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,16 +9,57 @@
 
     <script src="lib/jquery-3.6.0.min.js"></script>
 </head>
+
+<style>
+    input[type="number"],
+    input[type="date"] {
+        width: 95%;
+        padding: 2px;
+    }
+
+    input[type="button"],
+    input[type="submit"] {
+        width: 40%;
+        padding: 5px;
+    }
+
+    p {
+        margin: 5px 0;
+    }
+</style>
+
 <body>
-    <div style="width: 150px;">
+    <div style="width: 200px;">
         <h2>
             CF Analytics
         </h2>
+
+        <div style="margin: 0 10px; font-size: 1.2em;">
+            <p>Min Rating: <span id="ratingMinSpan">min</span></p>
+            <input type="number" id="ratingMin" min="800" max="3500" step="100" placeholder="min" />
+
+            <p>Max Rating: <span id="ratingMaxSpan">max</span></p>
+            <input type="number" id="ratingMax" min="800" max="3500" step="100" placeholder="max" />
+
+            <p>Min Date: <span id="dateMinSpan">oldest</span></p>
+            <input type="date" id="dateMin"/>
+
+            <p>Max Date: <span id="dateMaxSpan">newest</span></p>
+            <input type="date" id="dateMax"/>
+
+            <div style="width:100%; margin-top:20px; display: flex; justify-content: space-around;">
+                <input type="button" id="reset" value="Reset" />
+                <input type="submit" id="update" value="Update" />
+            </div>
+        </div>
+
         <h4>
             <a href="https://codeforces.com/profile">View your profile analytics</a>
         </h4>
-        Developed by <a href="https://codeforces.com/profile/apoorva222g">apoorva222g</a> 
+        Developed by <a href="https://codeforces.com/profile/apoorva222g">apoorva222g</a>
     </div>
+    <script src="js/utils.js"></script>
     <script src="js/popup.js"></script>
 </body>
+
 </html>
