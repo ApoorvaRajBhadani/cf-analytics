@@ -29,7 +29,6 @@ const colorArray = ['#ff867c','#ff77a9','#df78ef','#b085f5','#8e99f3','#80d6ff',
 chrome.runtime.sendMessage({todo:"appendHTML"},function(response){
     $('#pageContent').append(response.htmlResponse);
     const profileId = getProfileIdFromUrl(window.location.href);
-    console.log(profileId);
     $.get(`https://codeforces.com/api/user.status?handle=${profileId}`,function(data){
       if(data.status == "OK"){
         //processdata
@@ -100,13 +99,11 @@ function processData(resultArr){
   })
   $('#unsolved_count').text(`Count : ${unsolvedCount}`);
   for(let[key,val] of ratings){
-    // console.log(key+'-'+val);
     ratingChartLabel.push(key);
     ratingChartData.push(val);
     ratingChartBackgroundColor.push(ratingBackgroundColor(key));
   }
   for(let[key,val] of tags){
-    console.log(key+'-'+val);
     tagChartLabel.push(key);
     tagChartData.push(val);
   }
