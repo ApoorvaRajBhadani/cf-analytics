@@ -145,6 +145,14 @@ function createProblemRatingChart(){
                 },
                 beginAtZero: true
             }
+          },
+          onClick: function (event, legendItem) {
+            if (legendItem.length > 0) {
+                const ratingChartIndex = legendItem[0].index;
+                const ratingLevel = ratingChartLabel[ratingChartIndex];
+                const url = `https://codeforces.com/problemset?tags=${ratingLevel}-${ratingLevel}`;
+                window.location.href = url;
+            }
           }
       }
   });
@@ -171,6 +179,14 @@ function createTagChart(){
               display: false,
               position: 'right',
           },
+        },
+        onClick: function (event, legendItem) {
+          if (legendItem.length > 0) {
+              const tagChartIndex = legendItem[0].index;
+              const tag = tagChartLabel[tagChartIndex];
+              const url = `https://codeforces.com/problemset?tags=${tag}`;
+              window.location.href = url;
+          }
         }
       },
   });
