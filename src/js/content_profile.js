@@ -6,6 +6,18 @@ var ratingChartData = [];
 var ratingChartBackgroundColor = [];
 var tagChartLabel = [];
 var tagChartData = [];
+var rating_min = -1;
+var rating_max = -1;
+var date_min = -1;
+var date_max = -1;
+
+chrome.storage.sync.get(["ratingMin", "ratingMax", "dateMin", "dateMax", "useRatingMin", "useRatingMax", "useDateMin", "useDateMax"], data => {
+  if (data.ratingMin != "undefined" && data.useRatingMin) rating_min = data.ratingMin;
+  if (data.ratingMax != "undefined" && data.useRatingMax) rating_max = data.ratingMax;
+  if (data.dateMin != "undefined" && data.useDateMin) date_min = data.dateMin;
+  if (data.dateMax != "undefined" && data.useDateMax) date_max = data.dateMax;
+});
+
 ratings[Symbol.iterator] = function* () {
   yield* [...ratings.entries()].sort((a, b) =>{
     if(a[0]<b[0]){
@@ -28,6 +40,23 @@ tags[Symbol.iterator] = function* () {
 const colorArray = ['#ff867c','#ff77a9','#df78ef','#b085f5','#8e99f3','#80d6ff','#73e8ff','#6ff9ff','#64d8cb','#98ee99','#cfff95','#ffff89','#ffff8b','#fffd61','#ffd95b','#ffa270'];
 chrome.runtime.sendMessage({todo:"appendHTML"},function(response){
     $('#pageContent').append(response.htmlResponse);
+
+    if (rating_min != -1 || rating_max != -1) $("#ratingLi").show();
+    if (date_min != -1 || date_max != -1) $("#dateLi").show();
+
+    if (rating_min != -1){
+      $("#ratingMinSpan").text(rating_min);
+      $("#ratingMinSpan").addClass(ratingSpanColor(rating_min));
+      $("#ratingMinSpan").css("font-weight","bold");
+    }
+    if (rating_max != -1){
+      $("#ratingMaxSpan").text(rating_max);
+      $("#ratingMaxSpan").addClass(ratingSpanColor(rating_max));
+      $("#ratingMaxSpan").css("font-weight","bold");
+    }
+    if (date_min != -1) $("#dateMinSpan").text(timeToDate(date_min));
+    if (date_max != -1) $("#dateMaxSpan").text(timeToDate(date_max));
+   
     const profileId = getProfileIdFromUrl(window.location.href);
     $.get(`https://codeforces.com/api/user.status?handle=${profileId}`,function(data){
       if(data.status == "OK"){
@@ -54,47 +83,59 @@ function processData(resultArr){
     if(!problems.has(problemId)){
       problems.set(problemId,{
         solved: false,
+        use: false,
         rating: sub.problem.rating,
         contestId: sub.problem.contestId,
         index: sub.problem.index,
         tags: sub.problem.tags,
+        date: sub.creationTimeSeconds
       });
     }
-    if(sub.verdict=="OK"){
-      let obj = problems.get(problemId);
+    let obj = problems.get(problemId);
+    
+    if (obj.rating && 
+       (obj.rating >= rating_min || rating_min == -1) &&
+       (obj.rating <= rating_max || rating_max == -1) && 
+       (obj.date >= date_min || date_min == -1) && 
+       (obj.date < date_max || date_max == -1))
+      obj.use = true;
+      
+    if(sub.verdict=="OK")
       obj.solved = true;
+    
       problems.set(problemId,obj);
-    }
   }
   let unsolvedCount = 0;
   problems.forEach(function(prob){
-    if(prob.rating && prob.solved===true){
-      if(!ratings.has(prob.rating)){
-        ratings.set(prob.rating,0);
-      }
-      let cnt = ratings.get(prob.rating);
-      cnt++;
-      ratings.set(prob.rating,cnt);
-    }
-    if(prob.solved===false){
-      unsolvedCount++;
-      const problemURL = findProblemURL(prob.contestId,prob.index);
-      $('#unsolved_list').append(`
-          <a class="unsolved_problem" href="${problemURL}">
-            ${prob.contestId}-${prob.index}
-          </a>
-      `);
-      $('#unsolved_list').append("     ");
-    }
-    if(prob.solved===true){
-      prob.tags.forEach(function(tag){
-        if(!tags.has(tag)){
-          tags.set(tag,0);
+    if (prob.use){
+      if(prob.rating && prob.solved===true){
+        if(!ratings.has(prob.rating)){
+          ratings.set(prob.rating,0);
         }
-        let cnt = tags.get(tag);
+        let cnt = ratings.get(prob.rating);
         cnt++;
-        tags.set(tag,cnt);
-      })
+        ratings.set(prob.rating,cnt);
+      }
+      if(prob.solved===false){
+        unsolvedCount++;
+        const problemURL = findProblemURL(prob.contestId,prob.index);
+        $('#unsolved_list').append(`
+            <a class="unsolved_problem" href="${problemURL}">
+              ${prob.contestId}-${prob.index}
+            </a>
+        `);
+        $('#unsolved_list').append("     ");
+      }
+      if(prob.solved===true){
+        prob.tags.forEach(function(tag){
+          if(!tags.has(tag)){
+            tags.set(tag,0);
+          }
+          let cnt = tags.get(tag);
+          cnt++;
+          tags.set(tag,cnt);
+        })
+      }
     }
   })
   $('#unsolved_count').text(`Count : ${unsolvedCount}`);
@@ -231,4 +272,28 @@ function ratingBackgroundColor(rating){
   }else{
     return newbie;
   }
+}
+function ratingSpanColor(rating){
+  const red    = 'user-red';
+  const orange = 'user-orange';
+  const violet = 'user-violet';
+  const blue   = 'user-blue';
+  const cyan   = 'user-cyan';
+  const green  = 'user-green';
+  const gray   = 'user-gray';
+  
+  if(rating>=2400)
+    return red;
+  else if(rating>=2100 && rating<=2399)
+    return orange;
+  else if(rating>=1900 && rating<=2099)
+    return violet;
+  else if(rating>=1600 && rating<=1899)
+    return blue;
+  else if(rating>=1400 && rating<=1599)
+    return cyan;
+  else if(rating>=1200 && rating<=1399)
+    return green;
+  else
+    return gray; 
 }

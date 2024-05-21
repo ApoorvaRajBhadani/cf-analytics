@@ -20,11 +20,14 @@
     "content_scripts":[
         {
             "matches": ["https://codeforces.com/profile/*"],
-            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/content_profile.js"],
+            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/content_profile.js", "src/js/utils.js"],
             "css": ["src/css/content_profile.css"]
         }
     ],
     "host_permissions":[
         "https://codeforces.com/*"
+    ],
+    "permissions":[
+        "storage"
     ]
 }

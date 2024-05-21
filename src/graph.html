@@ -7,6 +7,21 @@
     <h4>
         Problem Ratings
     </h4>
+    <ul>
+        <li id="dateLi" style="display:none">
+            from
+            <span id="dateMinSpan">oldest</span>
+            to
+            <span id="dateMaxSpan">newest</span>
+        </li>
+
+        <li id="ratingLi" style="display:none">
+            from
+            <span id="ratingMinSpan">min</span>
+            to
+            <span id="ratingMaxSpan">max</span>
+        </li>
+    </ul>
     <div>
         <canvas id="problemRatingChart"></canvas>
     </div>
@@ -37,7 +52,7 @@
     <div class="roundbox-lb">&nbsp;</div>
     <div class="roundbox-rb">&nbsp;</div>
     <h4>
-        Unsolved Problems 
+        Unsolved Problems
     </h4>
     <br>
     <p id="unsolved_count">Loading...</p>
