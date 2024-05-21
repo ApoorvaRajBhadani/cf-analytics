@@ -6,7 +6,6 @@ var ratingChartData = [];
 var ratingChartBackgroundColor = [];
 var tagChartLabel = [];
 var tagChartData = [];
-
 var rating_min = -1;
 var rating_max = -1;
 var date_min = -1;
@@ -59,7 +58,6 @@ chrome.runtime.sendMessage({todo:"appendHTML"},function(response){
     if (date_max != -1) $("#dateMaxSpan").text(timeToDate(date_max));
    
     const profileId = getProfileIdFromUrl(window.location.href);
-    console.log(profileId);
     $.get(`https://codeforces.com/api/user.status?handle=${profileId}`,function(data){
       if(data.status == "OK"){
         //processdata
@@ -142,13 +140,11 @@ function processData(resultArr){
   })
   $('#unsolved_count').text(`Count : ${unsolvedCount}`);
   for(let[key,val] of ratings){
-    // console.log(key+'-'+val);
     ratingChartLabel.push(key);
     ratingChartData.push(val);
     ratingChartBackgroundColor.push(ratingBackgroundColor(key));
   }
   for(let[key,val] of tags){
-    // console.log(key+'-'+val);
     tagChartLabel.push(key);
     tagChartData.push(val);
   }
@@ -190,6 +186,14 @@ function createProblemRatingChart(){
                 },
                 beginAtZero: true
             }
+          },
+          onClick: function (event, legendItem) {
+            if (legendItem.length > 0) {
+                const ratingChartIndex = legendItem[0].index;
+                const ratingLevel = ratingChartLabel[ratingChartIndex];
+                const url = `https://codeforces.com/problemset?tags=${ratingLevel}-${ratingLevel}`;
+                window.location.href = url;
+            }
           }
       }
   });
@@ -216,6 +220,14 @@ function createTagChart(){
               display: false,
               position: 'right',
           },
+        },
+        onClick: function (event, legendItem) {
+          if (legendItem.length > 0) {
+              const tagChartIndex = legendItem[0].index;
+              const tag = tagChartLabel[tagChartIndex];
+              const url = `https://codeforces.com/problemset?tags=${tag}`;
+              window.location.href = url;
+          }
         }
       },
   });

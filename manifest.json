@@ -1,35 +1,30 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "CF Analytics",
-    "version": "0.1.2",
+    "version": "3.0.0",
     "description": "Analyse Codeforces profiles",
     "icons":{
         "128": "src/asset/icon128.png",
         "48": "src/asset/icon48.png",
         "16": "src/asset/icon16.png"
     },
-    "browser_action":{
+    "action":{
         "default_icon": "src/asset/icon16.png",
         "default_popup": "src/popup.html",
         "default_title": "CF Analytics"
     },
     "background":{
-        "scripts": ["src/js/eventPage.js"],
-        "persistent": false
+        "service_worker": "src/js/service_worker.js",
+        "type": "module"
     },
     "content_scripts":[
         {
-            "matches": ["https://codeforces.com/friends"],
-            "js": ["src/lib/jquery-3.6.0.min.js","src/js/contentFriends.js"],
-            "css": ["src/css/contentFriends.css"]
-        },
-        {
             "matches": ["https://codeforces.com/profile/*"],
-            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/contentProfile.js", "src/js/utils.js"],
-            "css": ["src/css/contentProfile.css"]
+            "js": ["src/lib/jquery-3.6.0.min.js","src/lib/chart.min.js","src/js/content_profile.js", "src/js/utils.js"],
+            "css": ["src/css/content_profile.css"]
         }
     ],
-    "permissions":[
+    "host_permissions":[
         "https://codeforces.com/*",
         "storage"
     ]
