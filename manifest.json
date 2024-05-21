@@ -25,7 +25,9 @@
         }
     ],
     "host_permissions":[
-        "https://codeforces.com/*",
+        "https://codeforces.com/*"
+    ],
+    "permissions":[
         "storage"
     ]
 }
