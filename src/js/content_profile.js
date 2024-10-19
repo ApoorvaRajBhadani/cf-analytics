@@ -61,22 +61,77 @@ chrome.runtime.sendMessage({todo:"appendHTML"},function(response){
     $.get(`https://codeforces.com/api/user.status?handle=${profileId}`,function(data){
       if(data.status == "OK"){
         //processdata
-        processData(data.result);
+        processSubmissionsData(data.result);
         createProblemRatingChart();
         createTagChart();
       }else{
         //response not loaded
         console.error(data.status + ' : ' + data.comment);
       }
+    });
+  fetchContestData(profileId)
+    .then((data) => {
+      if (data.hasOwnProperty('response')) {
+        let apiResponse = data.response[0];
+        let pCountData = data.response[1];
+        let dataPoints = { "D1": [], "D1+2": [], "D2": [], "ED2": [], "D3": [], "D4": [] };
+        for (var i = 0; i < apiResponse.result.length; i++) {
+          let ratingChange = apiResponse.result[i];
+          let contest = pCountData[ratingChange.contestId];
+          if (contest) {
+            let percentile = ratingChange.rank / contest.pCount;
+            let coordinates =
+            {
+              name: ratingChange.contestName,
+              start: contest.startTime,
+              percentile: 100 - (percentile * 100)
+            };
+            if (dataPoints[contest.div]) {
+              dataPoints[contest.div].push(coordinates);
+            }
+          } else {
+            console.log(`Contest ${ratingChange.contestName} not found in the list`);
+          }
+        }
+        createContestPercentileChart(dataPoints);
+      }
+      else {
+        console.error(data.errorMsg);
+      }
     })
+    .catch((error) => {
+      console.error(error);
+    });
 });
+
+async function fetchContestData(profileId) {
+  try {
+    let apiResponse = await fetch(`https://codeforces.com/api/user.rating?handle=${profileId}`);
+    apiResponse = await apiResponse.json();
+    if (apiResponse.status === "OK") {
+      let participantCountData = await fetch("https://raw.githubusercontent.com/rahulharpal1603/json/main/filtered_data.json");
+      if (!participantCountData.ok) {
+        throw new Error(`HTTP error! status: ${participantCountData.status}`);
+      }
+      else {
+        participantCountData = await participantCountData.json();
+        return { response: [apiResponse, participantCountData] };
+      }
+    }
+    else {
+      throw new Error(`CF API error! status: ${apiResponse.status}`);
+    }
+  } catch (error) {
+    return { errorMsg: error };
+  }
+}
 function getProfileIdFromUrl(url){
   var arr = url.split("/");
   var temp = arr.slice(-1);
   temp = temp[0].split('?',1);
   return temp;
 }
-function processData(resultArr){
+function processSubmissionsData(resultArr){
   for(var i = resultArr.length-1;i>=0;i--){
     var sub = resultArr[i];
     var problemId = sub.problem.contestId+'-'+sub.problem.index;
@@ -198,6 +253,113 @@ function createProblemRatingChart(){
       }
   });
 }
+
+
+function createContestPercentileChart(data) {
+  var ctx = document.getElementById('contestPercentileChart').getContext('2d');
+  
+  // Prepare datasets for each division
+  const divisions = Object.keys(data);  // Get division names
+  const colors = ['rgb(0, 0, 0)', 'rgb(255, 0, 0)', 'rgb(255, 140, 0)', 'rgb(170, 0, 170)', 'rgb(0, 0, 255)', 'rgb(3, 168, 158)']; // Assign different colors
+  const datasets = [];
+  let maxLength = data["D1"].length;
+  let maxFreq = "D1";
+  divisions.forEach((division) => {
+    if (data[division].length > maxLength) {
+      maxLength = data[division].length;
+      maxFreq = division;
+    }
+  });
+  
+  divisions.forEach((division, index) => {
+    // Map each division's data into the format required by Chart.js
+    const dataPoints = data[division].map(event => {
+      return {
+        x: new Date(event.start+'Z'),  // Keep date object for plotting
+        y: event.percentile,
+        contestName: event.name,   // Add contest name for tooltip
+        contestTime: new Date(event.start) // Store date object for local time in tooltip
+      };
+    });
+    
+    // Only add dataset if there are data points
+    if (dataPoints.length > 0) {
+      let hidden = division === maxFreq ? false : true;
+      datasets.push({
+        label: division,  // Use division as label
+        data: dataPoints, // Data points for this division
+        borderColor: colors[index % colors.length], // Cycle through the colors array
+        borderWidth: 2,
+        fill: false,
+        hidden: hidden
+      });
+    }
+  });
+
+  // Create chart
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: datasets  // Use datasets for multiple divisions
+    },
+    options: {
+      aspectRatio: 2.5,
+      responsive: true,
+      scales: {
+        x: {
+          autoSkip: true,
+          type: 'time',  // Time scale on the x-axis
+          time: {
+            unit: 'month',  // Auto-scale by month
+          },
+          ticks: {
+            maxTicksLimit: 7,
+            minRotation: 0,
+            maxRotation: 0,
+          }
+        },
+        y: {
+          beginAtZero: true,
+          min: 0,
+          max: 105,
+          title: {
+            display: true,
+            text: 'Percentile'
+          }
+        }
+      },
+      plugins: {
+        tooltip: {
+          boxPadding: 5,  // Add padding around the tooltip content
+          callbacks: {
+            title: function(tooltipItems) {
+              const date = tooltipItems[0].raw.x;  // Get the x-value (date)
+              return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false // Optional: Set to false for 24-hour time
+              });
+            },
+            // Customize the tooltip format
+            label: function(context) {
+              let percentile = '  Percentile: ' + context.raw.y.toFixed(2) ;
+              let contestName = '  '+context.raw.contestName;
+              // let contestTime = context.raw.contestTime.toLocaleString();  // Convert to local time for tooltip
+              
+              return [percentile, contestName]; // Return as array for new lines
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+
 function createTagChart(){
   var ctx = document.getElementById('tagChart').getContext('2d');
   var myChart = new Chart(ctx, {
