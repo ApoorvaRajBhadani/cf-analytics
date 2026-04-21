@@ -2,3 +2,19 @@
     background-color: transparent;
     text-decoration: none;
 }
+
+#problemRatingChart, #tagChart {
+    min-height: 200px !important;
+    max-height: 250px !important;
+    width: 100% !important;
+}
+
+#legends {
+    max-height: 250px !important;
+    overflow-y: auto !important;
+}
+
+#legend_unordered_list li {
+    margin-bottom: 5px;
+    font-size: 13px;
+}
